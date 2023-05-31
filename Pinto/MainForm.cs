@@ -24,7 +24,7 @@ namespace PintoNS
     public partial class MainForm : Form
     {
         public readonly string DataFolder = Path.Combine(Environment.GetFolderPath(
-            Environment.SpecialFolder.ApplicationData), "Pinto Classic!");
+            Environment.SpecialFolder.ApplicationData), "Pinto!");
         public readonly LocalizationManager LocalizationMgr = new LocalizationManager();
         public ContactsManager ContactsMgr;
         public InWindowPopupController InWindowPopupController;
