@@ -468,7 +468,7 @@
             this.Name = "UsingPintoForm";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Pinto! - Using Pinto";
+            this.Text = "Pinto Classic! - Using Pinto";
             this.Load += new System.EventHandler(this.UsingPintoForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudPort)).EndInit();
             this.pLoginControls.ResumeLayout(false);

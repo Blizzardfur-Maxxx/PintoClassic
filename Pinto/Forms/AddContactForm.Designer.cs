@@ -39,7 +39,7 @@
             this.txtContactName.Location = new System.Drawing.Point(12, 25);
             this.txtContactName.MaxLength = 16;
             this.txtContactName.Name = "txtContactName";
-            this.txtContactName.Size = new System.Drawing.Size(206, 20);
+            this.txtContactName.Size = new System.Drawing.Size(206, 22);
             this.txtContactName.TabIndex = 0;
             this.txtContactName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtContactName_KeyDown);
             // 
@@ -58,7 +58,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(8, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.Size = new System.Drawing.Size(61, 13);
             this.label1.TabIndex = 2;
             this.label1.Text = "Username:";
             // 
@@ -76,7 +76,8 @@
             this.MinimizeBox = false;
             this.Name = "AddContactForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Pinto! - Add contact";
+            this.Text = "Pinto Classic! - Add contact";
+            this.Load += new System.EventHandler(this.AddContactForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

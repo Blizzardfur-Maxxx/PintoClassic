@@ -41,5 +41,10 @@ namespace PintoNS.Forms
                 e.SuppressKeyPress = true;
             }
         }
+
+        private void AddContactForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

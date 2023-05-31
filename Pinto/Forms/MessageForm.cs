@@ -23,7 +23,7 @@ namespace PintoNS.Forms
             this.mainForm = mainForm;
             InWindowPopupController = new InWindowPopupController(this, 25);
             Receiver = receiver;
-            Text = $"Pinto! - Instant Messaging - Chatting with {Receiver.Name}";
+            Text = $"Pinto Classic! - Instant Messaging - Chatting with {Receiver.Name}";
 
             if (!Directory.Exists(Path.Combine(mainForm.DataFolder, 
                 "chats", mainForm.NetManager.NetClient.IP)))

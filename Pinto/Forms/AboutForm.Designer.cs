@@ -51,18 +51,18 @@
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(80, 92);
+            this.label1.Location = new System.Drawing.Point(36, 98);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(74, 29);
+            this.label1.Size = new System.Drawing.Size(158, 29);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Pinto!";
+            this.label1.Text = "Pinto Classic!";
             // 
             // lVersion
             // 
             this.lVersion.AutoSize = true;
             this.lVersion.Location = new System.Drawing.Point(12, 195);
             this.lVersion.Name = "lVersion";
-            this.lVersion.Size = new System.Drawing.Size(89, 13);
+            this.lVersion.Size = new System.Drawing.Size(98, 13);
             this.lVersion.TabIndex = 3;
             this.lVersion.Text = "Version unknown";
             // 
@@ -72,7 +72,7 @@
             this.label3.BackColor = System.Drawing.Color.Transparent;
             this.label3.Location = new System.Drawing.Point(62, 127);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(110, 13);
+            this.label3.Size = new System.Drawing.Size(114, 13);
             this.label3.TabIndex = 4;
             this.label3.Text = "Take a deep breath...";
             // 
@@ -97,7 +97,7 @@
             this.Name = "AboutForm";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Pinto! - About";
+            this.Text = "Pinto Classic! - About";
             this.Load += new System.EventHandler(this.AboutForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);

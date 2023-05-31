@@ -24,7 +24,7 @@ namespace PintoNS
     public partial class MainForm : Form
     {
         public readonly string DataFolder = Path.Combine(Environment.GetFolderPath(
-            Environment.SpecialFolder.ApplicationData), "Pinto!");
+            Environment.SpecialFolder.ApplicationData), "Pinto Classic!");
         public readonly LocalizationManager LocalizationMgr = new LocalizationManager();
         public ContactsManager ContactsMgr;
         public InWindowPopupController InWindowPopupController;
@@ -117,7 +117,7 @@ namespace PintoNS
         {
             niTray.Visible = true;
             niTray.Icon = User.StatusToIcon(CurrentUser.Status);
-            niTray.Text = $"Pinto! - " + 
+            niTray.Text = $"Pinto Classic! - " + 
                 (CurrentUser.Status != UserStatus.OFFLINE ? 
                 $"{CurrentUser.Name} - {User.StatusToText(CurrentUser.Status)}" : "Not logged in");
         }
@@ -474,8 +474,8 @@ namespace PintoNS
             if (WindowState == FormWindowState.Minimized) 
             {
                 Hide();
-                niTray.ShowBalloonTip(0, "Minimization Notice", "Pinto! has been minimized to the system tray!" +
-                    " You can restore Pinto! by clicking on the system tray icon!", ToolTipIcon.Info);
+                niTray.ShowBalloonTip(0, "Minimization Notice", "Pinto Classic! has been minimized to the system tray!" +
+                    " You can restore Pinto Classic! by clicking on the system tray icon!", ToolTipIcon.Info);
             }
         }
 

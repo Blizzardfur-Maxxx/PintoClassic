@@ -28,7 +28,7 @@ namespace PintoNS
             Application.ThreadException += Application_ThreadException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            // Start Pinto!
+            // Start Pinto Classic!
             Console = new ConsoleForm();
             Console.Show();
             Application.Run(new MainForm());

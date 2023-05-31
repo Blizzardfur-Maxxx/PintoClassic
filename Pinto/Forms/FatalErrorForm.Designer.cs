@@ -42,7 +42,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(157, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Pinto! has ran into an fatal error!";
+            this.label1.Text = "Pinto Classic! has ran into an fatal error!";
             // 
             // label2
             // 
@@ -89,7 +89,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FatalErrorForm";
-            this.Text = "Pinto! - Fatal Error";
+            this.Text = "Pinto Classic! - Fatal Error";
             this.ResumeLayout(false);
             this.PerformLayout();
 
