@@ -69,7 +69,8 @@
             this.rtxtInput.Size = new System.Drawing.Size(344, 56);
             this.rtxtInput.TabIndex = 0;
             this.rtxtInput.Text = "";
-            this.rtxtInput.SelectionChanged += new System.EventHandler(this.rtxtInput_SelectionChanged);
+            this.rtxtInput.ContentsResized += new System.Windows.Forms.ContentsResizedEventHandler(this.rtxtInput_ContentsResized);
+            this.rtxtInput.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.rtxtMessages_LinkClicked);
             this.rtxtInput.TextChanged += new System.EventHandler(this.rtxtInput_TextChanged);
             this.rtxtInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.rtxtInput_KeyDown);
             // 

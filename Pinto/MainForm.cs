@@ -65,7 +65,7 @@ namespace PintoNS
             tsmiMenuBarFileAddContact.Enabled = true;
             tsmiMenuBarFileRemoveContact.Enabled = true;
             tsmiMenuBarFileLogOut.Enabled = true;
-            Text = $"Pinto! - {CurrentUser.Name}";
+            Text = $"Pinto Classic! - {CurrentUser.Name}";
 
             new SoundPlayer(Sounds.LOGIN).Play();
         }
@@ -106,7 +106,7 @@ namespace PintoNS
             tsmiMenuBarFileAddContact.Enabled = false;
             tsmiMenuBarFileRemoveContact.Enabled = false;
             tsmiMenuBarFileLogOut.Enabled = false;
-            Text = "Pinto!";
+            Text = "Pinto Classic!";
             //InCall = false;
 
             if (!noSound)
