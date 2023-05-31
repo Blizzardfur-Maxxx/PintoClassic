@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PintoNS.Forms.Notification
@@ -41,21 +45,8 @@ namespace PintoNS.Forms.Notification
                     break;
             }
 
-            if (parent != null && parent.WindowState != FormWindowState.Normal) parent = null;
-            notification.StartPosition = parent == null ?
-                FormStartPosition.CenterScreen : FormStartPosition.CenterParent;
-
             if (nonBlocking) 
-            {
                 notification.Show(parent);
-
-                if (parent != null)
-                {
-                    int x = parent.Location.X + (parent.Width - notification.Width) / 2;
-                    int y = parent.Location.Y + (parent.Height - notification.Height) / 2;
-                    notification.Location = new Point(Math.Max(x, 0), Math.Max(y, 0));
-                }
-            }
             else
                 notification.ShowDialog(parent);
         }
@@ -93,21 +84,8 @@ namespace PintoNS.Forms.Notification
                     break;
             }
 
-            if (parent != null && parent.WindowState != FormWindowState.Normal) parent = null;
-            notification.StartPosition = parent == null ?
-                FormStartPosition.CenterScreen : FormStartPosition.CenterParent;
-
-            if (nonBlocking) 
-            {
+            if (nonBlocking)
                 notification.Show(parent);
-
-                if (parent != null)
-                {
-                    int x = parent.Location.X + (parent.Width - notification.Width) / 2;
-                    int y = parent.Location.Y + (parent.Height - notification.Height) / 2;
-                    notification.Location = new Point(Math.Max(x, 0), Math.Max(y, 0));
-                }
-            }
             else
                 notification.ShowDialog(parent);
         }

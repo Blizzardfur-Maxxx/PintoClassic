@@ -1,7 +1,14 @@
-﻿using PintoNS.Forms;
+﻿using PintoNS.Controls;
+using PintoNS.Forms;
+using PintoNS.Forms.Notification;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace PintoNS.General
 {
@@ -46,7 +53,6 @@ namespace PintoNS.General
             {
                 popup.ReachedTargetY = true;
                 popup.Location = new System.Drawing.Point(GetBaseX(), y);
-                popup.TopMost = true;
                 popup.Show();
                 popup.BringToFront();
 
@@ -58,7 +64,7 @@ namespace PintoNS.General
             }
         }
 
-        public void CreatePopup(string body, string title, int autoCloseTicks = 5)
+        public void CreatePopup(string body, string title)
         {
             int y = GetYPosForNew();
 
@@ -70,11 +76,6 @@ namespace PintoNS.General
             {
                 ClosePopup(popup);
             };
-            if (autoCloseTicks > 0)
-            {
-                popup.MaxAutoCloseTicks = autoCloseTicks;
-                popup.tAutoClose.Start();
-            }
 
             if (y < 0)
             {
@@ -83,7 +84,6 @@ namespace PintoNS.General
             }
 
             popup.Location = new System.Drawing.Point(GetBaseX(), GetBaseY() + 177);
-            popup.TopMost = true;
             popup.Show();
             popup.BringToFront();
 

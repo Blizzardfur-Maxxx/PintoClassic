@@ -162,16 +162,7 @@ namespace PintoNS.Networking
                         }
                     }
 
-                    if (packet.Status == UserStatus.BUSY &&
-                        contact.Status != UserStatus.BUSY)
-                    {
-                        MessageForm msgForm = mainForm
-                            .GetMessageFormFromReceiverName(packet.ContactName, true);
-                        if (msgForm != null)
-                            msgForm.InWindowPopupController.CreatePopup(
-                                $"{packet.ContactName} is now busy" +
-                                $" and may not see your messages");
-                    }
+
 
                     mainForm.ContactsMgr.UpdateContact(new Contact()
                     {

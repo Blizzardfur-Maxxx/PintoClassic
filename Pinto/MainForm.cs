@@ -1,18 +1,23 @@
-﻿using PintoNS.Forms;
-using PintoNS.Forms.Notification;
-using PintoNS.General;
+﻿using PintoNS.Localization;
 using PintoNS.Networking;
+using PintoNS;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Media;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Text;
 using System.Windows.Forms;
+using PintoNS.Forms.Notification;
+using System.Threading.Tasks;
+using PintoNS.Forms;
+using PintoNS.General;
+using System.Media;
+using System.Net.Sockets;
+using System.Net;
+using System.Threading;
+using System.IO;
 
 namespace PintoNS
 {
@@ -20,75 +25,57 @@ namespace PintoNS
     {
         public readonly string DataFolder = Path.Combine(Environment.GetFolderPath(
             Environment.SpecialFolder.ApplicationData), "Pinto!");
+        public readonly LocalizationManager LocalizationMgr = new LocalizationManager();
         public ContactsManager ContactsMgr;
         public InWindowPopupController InWindowPopupController;
         public PopupController PopupController;
         public NetworkManager NetManager;
         public User CurrentUser = new User();
         public List<MessageForm> MessageForms;
-        private bool doNotCancelClose;
-        public CallManager CallMgr;
-
+        /*
+        public AudioRecorderPlayer AudioRecPlyr;
+        public bool InCall;
+        public string CallTarget;
+        public UdpClient CallClient;
+        public IPEndPoint CallTargetIP;
+        public Thread CallReceiveThread;*/
+        
         public MainForm()
         {
             InitializeComponent();
-            Icon = Program.GetFormIcon();
             InWindowPopupController = new InWindowPopupController(this, 70);
             PopupController = new PopupController();
         }
 
-        internal void OnLogin()
+        internal void OnLogin() 
         {
             tcTabs.TabPages.Clear();
-            tcTabs.TabPages.Add(tpStart);
             tcTabs.TabPages.Add(tpContacts);
-            UpdateQuickActions(true);
             OnStatusChange(UserStatus.ONLINE);
-
-            // Use a DataTable to allow usage of more options than a plain DataGridView
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("contactStatus", typeof(Bitmap));
             dataTable.Columns.Add("contactName", typeof(string));
-
             dgvContacts.DataSource = dataTable;
             dgvContacts.Columns["contactStatus"].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             dgvContacts.Columns["contactStatus"].FillWeight = 24;
-            dgvContacts.Columns["contactStatus"].Width = 24;
+            dgvContacts.Columns["contactStatus"].Width = 24; ContactsMgr = new ContactsManager(this);
             MessageForms = new List<MessageForm>();
-
-            btnStartCall.Enabled = true;
-            btnStartCall.Image = Assets.STARTCALL_ENABLED;
-            txtSearchBox.Enabled = true;
-
-            tsmiMenuBarToolsAddContact.Enabled = true;
-            tsmiMenuBarToolsRemoveContact.Enabled = true;
-            tsmiMenuBarFileLogOff.Enabled = true;
+            // TODO: Currently pointless
+            //txtSearchBox.Enabled = true;
+            tsmiMenuBarFileAddContact.Enabled = true;
+            tsmiMenuBarFileRemoveContact.Enabled = true;
+            tsmiMenuBarFileLogOut.Enabled = true;
             Text = $"Pinto! - {CurrentUser.Name}";
 
             new SoundPlayer(Sounds.LOGIN).Play();
         }
 
-        internal void UpdateQuickActions(bool loggedInState) 
-        {
-            if (loggedInState) 
-            {
-                btnQAAddContact.Image = Assets.ADDCONTACT_ENABLED;
-                btnQAAddContact.Enabled = true;
-            }
-            else 
-            {
-                btnQAAddContact.Image = Assets.ADDCONTACT_DISABLED;
-                btnQAAddContact.Enabled = false;
-            }
-        }
-
-        internal void OnStatusChange(UserStatus status)
+        internal void OnStatusChange(UserStatus status) 
         {
             tsddbStatusBarStatus.Enabled = status != UserStatus.OFFLINE;
             tsddbStatusBarStatus.Image = User.StatusToBitmap(status);
             tsslStatusBarStatusText.Text = status != UserStatus.OFFLINE ? User.StatusToText(status) : "Not logged in";
             CurrentUser.Status = status;
-            if (status == UserStatus.OFFLINE) CurrentUser.Name = null;
             SyncTray();
         }
 
@@ -96,10 +83,9 @@ namespace PintoNS
         {
             tcTabs.TabPages.Clear();
             tcTabs.TabPages.Add(tpLogin);
-            UpdateQuickActions(false);
             OnStatusChange(UserStatus.OFFLINE);
 
-            if (MessageForms != null && MessageForms.Count > 0)
+            if (MessageForms != null && MessageForms.Count > 0) 
             {
                 foreach (MessageForm msgForm in MessageForms.ToArray())
                 {
@@ -107,30 +93,21 @@ namespace PintoNS
                     msgForm.Dispose();
                 }
             }
-            
+
             ContactsMgr = null;
             MessageForms = null;
-            dgvContacts.DataSource = null;
-            if (CallMgr != null) 
-            {
-                CallMgr.AllowClose = true;
-                CallMgr.Close();
-            }
-            CallMgr = null;
-
             btnStartCall.Enabled = false;
             btnStartCall.Image = Assets.STARTCALL_DISABLED;
             btnEndCall.Enabled = false;
             btnEndCall.Image = Assets.ENDCALL_DISABLED;
-
             txtSearchBox.Text = "";
             txtSearchBox.ChangeTextDisplayed();
             txtSearchBox.Enabled = false;
-
-            tsmiMenuBarToolsAddContact.Enabled = false;
-            tsmiMenuBarToolsRemoveContact.Enabled = false;
-            tsmiMenuBarFileLogOff.Enabled = false;
+            tsmiMenuBarFileAddContact.Enabled = false;
+            tsmiMenuBarFileRemoveContact.Enabled = false;
+            tsmiMenuBarFileLogOut.Enabled = false;
             Text = "Pinto!";
+            //InCall = false;
 
             if (!noSound)
                 new SoundPlayer(Sounds.LOGOUT).Play();
@@ -140,12 +117,108 @@ namespace PintoNS
         {
             niTray.Visible = true;
             niTray.Icon = User.StatusToIcon(CurrentUser.Status);
-            niTray.Text = $"Pinto! - " +
-                (CurrentUser.Status != UserStatus.OFFLINE ?
+            niTray.Text = $"Pinto! - " + 
+                (CurrentUser.Status != UserStatus.OFFLINE ? 
                 $"{CurrentUser.Name} - {User.StatusToText(CurrentUser.Status)}" : "Not logged in");
         }
 
-        public async Task Connect(string ip, int port, string username, string password)
+        /*
+        internal void OnCallStart()
+        {
+            InCall = true;
+            CallClient = new UdpClient();
+            AudioRecPlyr = new AudioRecorderPlayer();
+            CallReceiveThread = new Thread(new ThreadStart(() => 
+            {
+                while (InCall)
+                {
+                    try
+                    {
+                        if (CallClient != null && CallTargetIP != null && AudioRecPlyr != null)
+                        {
+                            byte[] data = CallClient.Receive(ref CallTargetIP);
+                            AudioRecPlyr.Play(data);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        new SoundPlayer(Sounds.CALL_ERROR1).Play();
+                        EndCall();
+                        Program.Console.WriteMessage($"[Calling] Call error: {ex}");
+                        InWindowPopupController.CreatePopup("Your call has ended due to an error");
+                    }
+                }
+            }));
+
+            btnStartCall.Enabled = false;
+            btnStartCall.Image = Assets.STARTCALL_DISABLED;
+            btnEndCall.Enabled = true;
+            btnEndCall.Image = Assets.ENDCALL_ENABLED;
+
+            lCallTarget.Text = $"In call with {CallTarget}";
+            tpCall.Text = CallTarget;
+
+            tcTabs.TabPages.Add(tpCall);
+            tcTabs.SelectedTab = tpCall;
+
+            AudioRecPlyr.MicrophoneDataAvailable += delegate (object sender, byte[] data) 
+            {
+                if (InCall && CallClient != null && CallTargetIP != null)
+                {
+                    try
+                    {
+                        CallClient.Send(data, data.Length, CallTargetIP);
+                    }
+                    catch (Exception ex)
+                    {
+                        new SoundPlayer(Sounds.CALL_ERROR1).Play();
+                        EndCall();
+                        Program.Console.WriteMessage($"[Calling] Call error: {ex}");
+                        InWindowPopupController.CreatePopup("Your call has ended due to an error");
+                    }
+                }
+            };
+
+            CallClient.Client.Bind(new IPEndPoint(IPAddress.Any, 0));
+            AudioRecPlyr.Start();
+            CallReceiveThread.Start();
+        }
+
+        internal void OnCallStop()
+        {
+            if (CallClient != null && CallClient.Client != null) 
+            {
+                CallClient.Client.Close();
+                CallClient.Close();
+            }
+            AudioRecPlyr.Stop();
+
+            InCall = false;
+            CallClient = null;
+            CallTarget = null;
+            CallTargetIP = null;
+            AudioRecPlyr = null;
+            CallReceiveThread = null;
+
+            if (dgvContacts.SelectedRows.Count > 0)
+            {
+                btnStartCall.Enabled = true;
+                btnStartCall.Image = Assets.STARTCALL_ENABLED;
+            }
+            else
+            {
+                btnStartCall.Enabled = false;
+                btnStartCall.Image = Assets.STARTCALL_DISABLED;
+            }
+            btnEndCall.Enabled = false;
+            btnEndCall.Image = Assets.ENDCALL_DISABLED;
+
+            lCallTarget.Text = $"In call with";
+            tcTabs.SelectedTab = tpContacts;
+            tcTabs.TabPages.Remove(tpCall);
+        }*/
+
+        public async Task Connect(string ip, int port, string username, string password) 
         {
             tcTabs.TabPages.Clear();
             tcTabs.TabPages.Add(tpConnecting);
@@ -158,12 +231,11 @@ namespace PintoNS
             if (!connectResult.Item1)
             {
                 Disconnect();
-                lConnectingStatus.Text = "";
                 Program.Console.WriteMessage($"[Networking] Unable to connect to {ip}:{port}: {connectResult.Item2}");
                 MsgBox.ShowNotification(this, $"Unable to connect to {ip}:{port}:" +
                     $" {connectResult.Item2.Message}", "Connection Error", MsgBoxIconType.ERROR);
             }
-            else
+            else 
             {
                 CurrentUser.Name = username;
                 lConnectingStatus.Text = "Authenticating...";
@@ -184,7 +256,6 @@ namespace PintoNS
             if (!connectResult.Item1)
             {
                 Disconnect();
-                lConnectingStatus.Text = "";
                 Program.Console.WriteMessage($"[Networking] Unable to connect to {ip}:{port}: {connectResult.Item2}");
                 MsgBox.ShowNotification(this, $"Unable to connect to {ip}:{port}:" +
                     $" {connectResult.Item2.Message}", "Connection Error", MsgBoxIconType.ERROR);
@@ -197,11 +268,11 @@ namespace PintoNS
             }
         }
 
-        public void Disconnect()
+        public void Disconnect() 
         {
             Program.Console.WriteMessage("[Networking] Disconnecting...");
             bool wasLoggedIn = false;
-            if (NetManager != null)
+            if (NetManager != null) 
             {
                 wasLoggedIn = NetManager.NetHandler.LoggedIn;
                 if (NetManager.IsActive)
@@ -210,70 +281,62 @@ namespace PintoNS
             OnLogout(!wasLoggedIn);
             NetManager = null;
         }
-
-        public MessageForm GetMessageFormFromReceiverName(string name, bool doNotCreate = false)
+        
+        public MessageForm GetMessageFormFromReceiverName(string name) 
         {
             Program.Console.WriteMessage($"Getting MessageForm for {name}...");
 
-            foreach (MessageForm msgForm in MessageForms.ToArray())
+            foreach (MessageForm msgForm in MessageForms.ToArray()) 
             {
                 if (msgForm.Receiver.Name == name)
                     return msgForm;
             }
 
-            MessageForm messageForm = null;
-
-            if (!doNotCreate) 
-            {
-                Program.Console.WriteMessage($"Creating MessageForm for {name}...");
-                messageForm = new MessageForm(this, ContactsMgr.GetContact(name));
-                MessageForms.Add(messageForm);
-                messageForm.Show();
-            }
+            Program.Console.WriteMessage($"Creating MessageForm for {name}...");
+            MessageForm messageForm = new MessageForm(this, ContactsMgr.GetContact(name));
+            MessageForms.Add(messageForm);
+            messageForm.Show();
 
             return messageForm;
         }
 
-        private async void MainForm_Load(object sender, EventArgs e)
+        /*
+        public void EndCall()
+        {
+            if (!InCall) return;
+            Program.Console.WriteMessage("[General] Ending call...");
+            NetManager.NetHandler.SendCallEndPacket();
+            OnCallStop();
+        }*/
+
+        private void MainForm_Load(object sender, EventArgs e)
         {
             Program.Console.WriteMessage("Performing first time initialization...");
-
             OnLogout(true);
-            if (!Directory.Exists(DataFolder))
+            if (!Directory.Exists(DataFolder)) 
+            {
                 Directory.CreateDirectory(DataFolder);
-            if (!Directory.Exists(Path.Combine(DataFolder, "chats")))
-                Directory.CreateDirectory(Path.Combine(DataFolder, "chats"));
-
-            await CheckForUpdates(false);
+            }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!doNotCancelClose && e.CloseReason == CloseReason.UserClosing) 
-            {
-                e.Cancel = true;
-                Hide();
-                return;
-            }
             Program.Console.WriteMessage("Quitting...");
-            bool wasLoggedIn = NetManager != null && NetManager.NetHandler.LoggedIn;
-            OnLogout(false);
+            /*
+            if (InCall)
+            {
+                OnCallStop();
+                NetManager.NetHandler.SendCallEndPacket();
+            }*/
             Disconnect();
-            if (wasLoggedIn)
-                new Thread(new ThreadStart(() => 
-                {
-                    new SoundPlayer(Sounds.LOGOUT).PlaySync();
-                })).Start();
         }
 
         private void dgvContacts_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            // Stolen from https://stackoverflow.com/a/50999419
-            string contactName = ContactsMgr.GetContactNameFromRow(
-                ((DataTable)dgvContacts.DataSource).Rows.IndexOf(
-                    ((DataRowView)BindingContext[dgvContacts.DataSource].Current).Row));
+            string contactName = ContactsMgr.GetContactNameFromRow(e.RowIndex);
+            Contact contact = ContactsMgr.GetContact(contactName);
 
-            if (contactName != null)
+            if (contactName != null && contact != null) 
             {
                 MessageForm messageForm = GetMessageFormFromReceiverName(contactName);
                 messageForm.WindowState = FormWindowState.Normal;
@@ -293,7 +356,10 @@ namespace PintoNS
             Disconnect();
         }
 
-        private void tsmiMenuBarHelpAbout_Click(object sender, EventArgs e) => new AboutForm().Show();
+        private void tsmiMenuBarHelpAbout_Click(object sender, EventArgs e)
+        {
+            new AboutForm().ShowDialog(this);
+        }
 
         private void tsmiStatusBarStatusOnline_Click(object sender, EventArgs e)
         {
@@ -313,8 +379,6 @@ namespace PintoNS
         {
             if (NetManager == null) return;
             Program.Console.WriteMessage("[General] Changing status...");
-            InWindowPopupController.CreatePopup("You are now busy" +
-                ", this means that you will not receive any non-important popups");
             NetManager.ChangeStatus(UserStatus.BUSY);
         }
 
@@ -323,22 +387,22 @@ namespace PintoNS
             if (NetManager == null) return;
             Program.Console.WriteMessage("[General] Changing status...");
             MsgBox.ShowPromptNotification(this, "If you choose to change your status to invisible," +
-                " your contacts will not be able to send you messages. Are you sure you want to continue?", "Status change confirmation",
-                MsgBoxIconType.WARNING, false, (MsgBoxButtonType button) =>
+                " your contacts will not be able to send you messages. Are you sure you want to continue?", "Status change confirmation", 
+                MsgBoxIconType.WARNING, false, (MsgBoxButtonType button) => 
             {
                 if (button == MsgBoxButtonType.YES)
                     NetManager.ChangeStatus(UserStatus.INVISIBLE);
             });
         }
 
-        private void tsmiMenuBarToolsAddContact_Click(object sender, EventArgs e)
+        private void tsmiMenuBarFileAddContact_Click(object sender, EventArgs e)
         {
             if (NetManager == null) return;
             AddContactForm addContactForm = new AddContactForm(this);
             addContactForm.ShowDialog(this);
         }
 
-        private void tsmiMenuBarToolsRemoveContact_Click(object sender, EventArgs e)
+        private void tsmiMenuBarFileRemoveContact_Click(object sender, EventArgs e)
         {
             if (NetManager == null) return;
             if (dgvContacts.SelectedRows.Count < 1)
@@ -353,6 +417,8 @@ namespace PintoNS
         private void dgvContacts_SelectionChanged(object sender, EventArgs e)
         {
             /*
+            if (InCall) return;
+
             if (dgvContacts.SelectedRows.Count > 0)
             {
                 btnStartCall.Enabled = true;
@@ -367,23 +433,27 @@ namespace PintoNS
 
         private void btnStartCall_Click(object sender, EventArgs e)
         {
-            btnStartCall.Enabled = false;
-            btnStartCall.Image = Assets.STARTCALL_DISABLED;
-            btnEndCall.Enabled = true;
-            btnEndCall.Image = Assets.ENDCALL_ENABLED;
-            CallMgr = new CallManager(this);
-            CallMgr.Show();
-            CallMgr.BringToFront();
+            /*
+            if (InCall) return;
+
+            string contactName = ContactsMgr.GetContactNameFromRow(dgvContacts.SelectedRows[0].Index);
+            Contact contact = ContactsMgr.GetContact(contactName);
+
+            CallTarget = contactName;
+            Program.Console.WriteMessage("[General] Starting call...");
+            OnCallStart();
+
+            new SoundPlayer(Sounds.CALL_INIT).Play();
+            NetManager.NetHandler.SendCallStartPacket(contactName);
+            if (CallClient != null && CallClient.Client != null && CallClient.Client.LocalEndPoint != null)
+                NetManager.NetHandler.SendCallPartyInfoPacket(((IPEndPoint)CallClient.Client.LocalEndPoint).Port);
+            else
+                Program.Console.WriteMessage("[Networking] Unable to send the UDP client port!");*/
         }
 
         private void btnEndCall_Click(object sender, EventArgs e)
         {
-            btnStartCall.Enabled = true;
-            btnStartCall.Image = Assets.STARTCALL_ENABLED;
-            btnEndCall.Enabled = false;
-            btnEndCall.Image = Assets.ENDCALL_DISABLED;
-            CallMgr.AllowClose = true;
-            CallMgr.Close();
+            //EndCall();
         }
 
         private void tsmiMenuBarHelpToggleConsole_Click(object sender, EventArgs e)
@@ -394,128 +464,31 @@ namespace PintoNS
                 Program.Console.Show();
         }
 
+        private void tsmiTrayExit_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized) 
+            {
+                Hide();
+                niTray.ShowBalloonTip(0, "Minimization Notice", "Pinto! has been minimized to the system tray!" +
+                    " You can restore Pinto! by clicking on the system tray icon!", ToolTipIcon.Info);
+            }
+        }
+
         private void niTray_DoubleClick(object sender, EventArgs e)
         {
             Show();
             WindowState = FormWindowState.Normal;
-            BringToFront();
         }
 
-        private void tsmiMenuBarFileOptions_Click(object sender, EventArgs e)
+        private void tsmiMenuBarToolsOptions_Click(object sender, EventArgs e)
         {
             OptionsForm optionsForm = new OptionsForm();
             optionsForm.ShowDialog(this);
-        }
-
-        private void tsmiMenuBarFileExit_Click(object sender, EventArgs e) 
-        {
-            MsgBox.ShowPromptNotification(null, "Are you sure you want to close Pinto?" +
-                " You will no longer receive messages or calls if you do so.", "Quit Pinto?",
-                MsgBoxIconType.QUESTION, false, (MsgBoxButtonType answer) =>
-                {
-                    if (answer == MsgBoxButtonType.YES) 
-                    {
-                        doNotCancelClose = true;
-                        Close();
-                    }
-                });
-        }
-
-        public async Task CheckForUpdates(bool showLatestMessage) 
-        {
-            if (!await Updater.IsLatest())
-                MsgBox.ShowPromptNotification(this,
-                    "An update is available, do you want to download it and install it?",
-                    "Update Available",
-                    MsgBoxIconType.QUESTION,
-                    true, async (MsgBoxButtonType btn) =>
-                    {
-                        if (btn == MsgBoxButtonType.YES)
-                        {
-                            string path = Path.Combine(DataFolder, "PintoSetup.msi");
-                            if (File.Exists(path))
-                                File.Delete(path);
-
-                            byte[] file = await Updater.GetUpdateFile();
-                            if (file == null) return;
-                            File.WriteAllBytes(path, file);
-                            Program.Console.WriteMessage($"[Updater] Saved update file at {path}");
-
-                            Program.Console.WriteMessage($"[Updater] Running msi installer at {path}...");
-                            Process process = new Process();
-                            process.StartInfo.FileName = "msiexec.exe";
-                            process.StartInfo.Arguments = " /i PintoSetup.msi /passive /norestart";
-                            process.StartInfo.WorkingDirectory = DataFolder;
-                            process.Start();
-
-                            Program.Console.WriteMessage($"[Updater] Exitting...");
-                            doNotCancelClose = true;
-                            Close();
-                        }
-                    });
-            else if (showLatestMessage)
-                MsgBox.ShowNotification(this, "You are already on the latest version of Pinto!",
-                    "Latest version", MsgBoxIconType.INFORMATION, true);
-        }
-
-        private async void tsmiMenuBarHelpCheckForUpdates_Click(object sender, EventArgs e)
-            => await CheckForUpdates(true);
-
-        private void txtSearchBox_TextChanged2(object sender, EventArgs e)
-        {
-            DataTable dataTable = dgvContacts.DataSource as DataTable;
-            if (string.IsNullOrWhiteSpace(txtSearchBox.Text))
-                dataTable.DefaultView.RowFilter = "";
-            else
-                dataTable.DefaultView.RowFilter = $"contactName Like '{txtSearchBox.Text}*'";
-            dgvContacts.Refresh();
-        }
-
-        private void llStartContacts_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            tcTabs.SelectedTab = tpContacts;
-        }
-
-        private void tsmiMenuBarHelpReportAProblem_Click(object sender, EventArgs e) 
-            => Process.Start("https://github.com/PintoIM/Pinto/issues");
-
-        private void tContactsOnlineUpdate_Tick(object sender, EventArgs e)
-        {
-            if (ContactsMgr == null) return;
-            int online = ContactsMgr.GetContacts().Count((Contact contact) =>
-            {
-                return contact.Status != UserStatus.OFFLINE;
-            });
-            llStartContacts.Text = $"{online} Contacts Online";
-        }
-
-        private void dgvContacts_CellContextMenuStripNeeded(object sender,
-            DataGridViewCellContextMenuStripNeededEventArgs e)
-        {
-            ContextMenuStrip contextMenu = new ContextMenuStrip();
-            contextMenu.ShowImageMargin = false;
-
-            ToolStripMenuItem startMessaging = new ToolStripMenuItem("Start Messaging");
-            ToolStripMenuItem removeContact = new ToolStripMenuItem("Remove Contact");
-
-            startMessaging.Click += new EventHandler((object sender2, EventArgs e2) =>
-            {
-                string contactName = ContactsMgr.GetContactNameFromRow(e.RowIndex);
-                MessageForm messageForm = GetMessageFormFromReceiverName(contactName);
-                messageForm.WindowState = FormWindowState.Normal;
-                messageForm.BringToFront();
-                messageForm.Focus();
-            });
-
-            removeContact.Click += new EventHandler((object sender2, EventArgs e2) =>
-            {
-                string contactName = ContactsMgr.GetContactNameFromRow(e.RowIndex);
-                NetManager.NetHandler.SendRemoveContactPacket(contactName);
-            });
-
-            contextMenu.Items.Add(startMessaging);
-            contextMenu.Items.Add(removeContact);
-            e.ContextMenuStrip = contextMenu;
         }
     }
 }

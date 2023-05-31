@@ -1,10 +1,18 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using PintoNS.Forms.Notification;
+﻿using PintoNS.Forms.Notification;
+using PintoNS;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Drawing;
-using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace PintoNS.Forms
 {
@@ -15,18 +23,17 @@ namespace PintoNS.Forms
         public UsingPintoForm(MainForm mainForm)
         {
             InitializeComponent();
-            Icon = Program.GetFormIcon();
             this.mainForm = mainForm;
         }
 
-        private void LoadLogin()
+        private void LoadLogin() 
         {
             Program.Console.WriteMessage("[General] Loading saved login information...");
             try
             {
                 string filePath = Path.Combine(mainForm.DataFolder, "login.json");
                 if (!File.Exists(filePath)) return;
-
+                
                 string fileData = File.ReadAllText(filePath);
                 JObject data = JsonConvert.DeserializeObject<JObject>(fileData);
 
@@ -35,7 +42,7 @@ namespace PintoNS.Forms
                 txtIP.Text = data["ip"].Value<string>();
                 nudPort.Value = data["port"].Value<int>();
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 Program.Console.WriteMessage($"[General]" +
                     $" Unable to load the saved login information: {ex}");
@@ -45,10 +52,10 @@ namespace PintoNS.Forms
             }
         }
 
-        private void SaveLogin()
+        private void SaveLogin() 
         {
             Program.Console.WriteMessage("[General] Saving login information...");
-            try
+            try 
             {
                 string filePath = Path.Combine(mainForm.DataFolder, "login.json");
                 JObject data = new JObject();
@@ -58,9 +65,9 @@ namespace PintoNS.Forms
                 data.Add("ip", txtIP.Text);
                 data.Add("port", (int)nudPort.Value);
 
-                File.WriteAllText(filePath, data.ToString(Formatting.Indented));
+                File.WriteAllText(filePath, data.ToString(Newtonsoft.Json.Formatting.Indented));
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 Program.Console.WriteMessage($"[General]" +
                     $" Unable to save the login information: {ex}");
@@ -70,7 +77,7 @@ namespace PintoNS.Forms
             }
         }
 
-        private void DeleteLogin()
+        private void DeleteLogin() 
         {
             Program.Console.WriteMessage("[General] Deleting saved login information...");
             try
@@ -173,17 +180,6 @@ namespace PintoNS.Forms
         {
             if (!cbSavePassword.Checked)
                 DeleteLogin();
-        }
-
-        private void llServers_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            ServerListForm serverListForm = new ServerListForm();
-            serverListForm.ServerUse += (object sender2, ServerUseEventArgs e2) => 
-            {
-                txtIP.Text = e2.IP;
-                nudPort.Value = e2.Port;
-            };
-            serverListForm.ShowDialog();
         }
     }
 }

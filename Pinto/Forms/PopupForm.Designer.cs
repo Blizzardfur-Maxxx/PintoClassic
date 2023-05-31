@@ -30,23 +30,18 @@
         {
             this.components = new System.ComponentModel.Container();
             this.pNotification = new System.Windows.Forms.Panel();
-            this.lAutoClose = new System.Windows.Forms.Label();
             this.lSeeContent = new System.Windows.Forms.LinkLabel();
             this.btnClose = new System.Windows.Forms.Button();
             this.lBody = new System.Windows.Forms.Label();
             this.lTitle = new System.Windows.Forms.Label();
             this.tAnim = new System.Windows.Forms.Timer(this.components);
             this.tSizeCheck = new System.Windows.Forms.Timer(this.components);
-            this.tAutoClose = new System.Windows.Forms.Timer(this.components);
             this.pNotification.SuspendLayout();
             this.SuspendLayout();
             // 
             // pNotification
             // 
-            this.pNotification.BackgroundImage = global::PintoNS.Logo.LOGO_BACKGROUND;
-            this.pNotification.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.pNotification.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pNotification.Controls.Add(this.lAutoClose);
             this.pNotification.Controls.Add(this.lSeeContent);
             this.pNotification.Controls.Add(this.btnClose);
             this.pNotification.Controls.Add(this.lBody);
@@ -57,20 +52,9 @@
             this.pNotification.Size = new System.Drawing.Size(200, 177);
             this.pNotification.TabIndex = 0;
             // 
-            // lAutoClose
-            // 
-            this.lAutoClose.AutoSize = true;
-            this.lAutoClose.Location = new System.Drawing.Point(151, 12);
-            this.lAutoClose.Name = "lAutoClose";
-            this.lAutoClose.Size = new System.Drawing.Size(13, 13);
-            this.lAutoClose.TabIndex = 1;
-            this.lAutoClose.Text = "5";
-            this.lAutoClose.Visible = false;
-            // 
             // lSeeContent
             // 
             this.lSeeContent.AutoSize = true;
-            this.lSeeContent.BackColor = System.Drawing.Color.Transparent;
             this.lSeeContent.Location = new System.Drawing.Point(61, 155);
             this.lSeeContent.Name = "lSeeContent";
             this.lSeeContent.Size = new System.Drawing.Size(78, 13);
@@ -93,7 +77,6 @@
             // 
             // lBody
             // 
-            this.lBody.BackColor = System.Drawing.Color.Transparent;
             this.lBody.Location = new System.Drawing.Point(13, 36);
             this.lBody.Name = "lBody";
             this.lBody.Size = new System.Drawing.Size(175, 119);
@@ -121,11 +104,6 @@
             this.tSizeCheck.Interval = 1000;
             this.tSizeCheck.Tick += new System.EventHandler(this.tSizeCheck_Tick);
             // 
-            // tAutoClose
-            // 
-            this.tAutoClose.Interval = 1000;
-            this.tAutoClose.Tick += new System.EventHandler(this.tAutoClose_Tick);
-            // 
             // PopupForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -134,8 +112,6 @@
             this.Controls.Add(this.pNotification);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "PopupForm";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "NotificationForm";
             this.pNotification.ResumeLayout(false);
@@ -153,7 +129,5 @@
         private System.Windows.Forms.Timer tAnim;
         private System.Windows.Forms.LinkLabel lSeeContent;
         private System.Windows.Forms.Timer tSizeCheck;
-        private System.Windows.Forms.Label lAutoClose;
-        public System.Windows.Forms.Timer tAutoClose;
     }
 }

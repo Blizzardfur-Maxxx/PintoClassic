@@ -1,6 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace PintoNS.Controls
@@ -15,9 +17,6 @@ namespace PintoNS.Controls
         public string PlaceholderText { get { return placeholderText; } set { placeholderText = value; } }
         public Color TextForeColor { get { return textForeColor; } set { textForeColor = value; } }
         public Color PlaceholderTextForeColor { get { return placeholderTextForeColor; } set { placeholderTextForeColor = value; } }
-        [Browsable(true)]
-        [EditorBrowsable(EditorBrowsableState.Always)]
-        public event EventHandler TextChanged2;
 
         public void ChangeTextDisplayed() 
         {
@@ -57,13 +56,6 @@ namespace PintoNS.Controls
             base.OnLostFocus(e);
             isFocused = false;
             ChangeTextDisplayed();
-        }
-
-        protected override void OnTextChanged(EventArgs e)
-        {
-            if (isFocused)
-                TextChanged2.Invoke(this, e);
-            base.OnTextChanged(e);
         }
     }
 }

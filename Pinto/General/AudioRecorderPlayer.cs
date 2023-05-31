@@ -1,7 +1,11 @@
 ﻿using NAudio.Wave;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace PintoNS.General
 {
@@ -14,8 +18,7 @@ namespace PintoNS.General
         private WaveIn waveIn;
         private WaveOut waveOut;
         public int MicrophoneDevice;
-        public int SpeakerDevice;
-        public event Action<byte[]> MicrophoneDataAvailable;
+        public event EventHandler<byte[]> MicrophoneDataAvailable;
 
         public void Start()
         {
@@ -23,7 +26,6 @@ namespace PintoNS.General
             waveIn.BufferMilliseconds = 100;
             waveIn.NumberOfBuffers = 10;
             waveOut = new WaveOut();
-            waveOut.DeviceNumber = SpeakerDevice;
 
             waveIn.DeviceNumber = MicrophoneDevice;
             waveIn.DataAvailable += new EventHandler<WaveInEventArgs>(waveIn_DataAvailable);
@@ -40,7 +42,7 @@ namespace PintoNS.General
         private void waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
             if (MicrophoneDataAvailable != null)
-                MicrophoneDataAvailable.Invoke(e.Buffer);
+                MicrophoneDataAvailable.Invoke(this, e.Buffer);
         }
 
         public void Stop()
@@ -69,7 +71,6 @@ namespace PintoNS.General
         private void AudioPlayerThread_Func()
         {
             playBuffer = new BufferedWaveProvider(waveIn.WaveFormat);
-            playBuffer.DiscardOnBufferOverflow = true;
             waveOut.Init(playBuffer);
             waveOut.Play();
 

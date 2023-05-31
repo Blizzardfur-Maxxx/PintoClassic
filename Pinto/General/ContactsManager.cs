@@ -11,25 +11,25 @@ namespace PintoNS.General
         private DataTable dataTable;
         private List<Contact> contacts = new List<Contact>();
 
-        public ContactsManager(MainForm mainForm) 
+        public ContactsManager(MainForm mainForm)
         {
             this.mainForm = mainForm;
             dgvContacts = mainForm.dgvContacts;
-            dataTable = (DataTable) mainForm.dgvContacts.DataSource;
+            dataTable = (DataTable)mainForm.dgvContacts.DataSource;
         }
 
-        private DataRow GetContactListEntry(string name) 
+        private DataRow GetContactListEntry(string name)
         {
             if (name == null) return null;
 
-            foreach (DataRow row in dataTable.Rows) 
-                if (((string)row[1]) == name) 
+            foreach (DataRow row in dataTable.Rows)
+                if (((string)row[1]) == name)
                     return row;
 
             return null;
         }
 
-        private void AddContactListEntry(Contact contact) 
+        private void AddContactListEntry(Contact contact)
         {
             if (GetContactListEntry(contact.Name) == null)
                 dataTable.Rows.Add(User.StatusToBitmap(contact.Status), contact.Name);
@@ -38,11 +38,11 @@ namespace PintoNS.General
         private void RemoveContactListEntry(Contact contact)
         {
             DataRow row;
-            if ((row = GetContactListEntry(contact.Name)) != null) 
+            if ((row = GetContactListEntry(contact.Name)) != null)
                 dataTable.Rows.Remove(row);
         }
 
-        private void UpdateContactListEntry(Contact contact) 
+        private void UpdateContactListEntry(Contact contact)
         {
             DataRow row;
             if ((row = GetContactListEntry(contact.Name)) != null)
@@ -52,7 +52,7 @@ namespace PintoNS.General
             }
         }
 
-        public string GetContactNameFromRow(int rowIndex) 
+        public string GetContactNameFromRow(int rowIndex)
         {
             foreach (DataRow row in dataTable.Rows)
             {
@@ -63,11 +63,11 @@ namespace PintoNS.General
             return null;
         }
 
-        public Contact GetContact(string name) 
+        public Contact GetContact(string name)
         {
             if (name == null) return null;
 
-            foreach (Contact contact in contacts.ToArray()) 
+            foreach (Contact contact in contacts.ToArray())
             {
                 if (contact.Name == name)
                     return contact;
@@ -78,7 +78,7 @@ namespace PintoNS.General
 
         public void AddContact(Contact contact)
         {
-            if (GetContact(contact.Name) == null) 
+            if (GetContact(contact.Name) == null)
             {
                 AddContactListEntry(contact);
                 contacts.Add(contact);
@@ -94,7 +94,7 @@ namespace PintoNS.General
             }
         }
 
-        public void UpdateContact(Contact contact) 
+        public void UpdateContact(Contact contact)
         {
             if (GetContact(contact.Name) != null)
             {

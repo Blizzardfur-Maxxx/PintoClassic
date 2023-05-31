@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UsingPintoForm));
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
             this.txtIP = new System.Windows.Forms.TextBox();
@@ -38,7 +39,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.pLoginControls = new System.Windows.Forms.Panel();
-            this.llServers = new System.Windows.Forms.LinkLabel();
             this.txtUsername = new System.Windows.Forms.ComboBox();
             this.rbLogin = new System.Windows.Forms.RadioButton();
             this.rbCreate = new System.Windows.Forms.RadioButton();
@@ -48,6 +48,8 @@
             this.pbAd = new System.Windows.Forms.PictureBox();
             this.tcSections = new System.Windows.Forms.TabControl();
             this.tpMain = new System.Windows.Forms.TabPage();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
             this.tpRegister = new System.Windows.Forms.TabPage();
             this.label5 = new System.Windows.Forms.Label();
             this.btnRegisterBack = new System.Windows.Forms.Button();
@@ -97,7 +99,7 @@
             this.txtIP.Name = "txtIP";
             this.txtIP.Size = new System.Drawing.Size(106, 20);
             this.txtIP.TabIndex = 2;
-            this.txtIP.Text = "ponso00.com";
+            this.txtIP.Text = "127.0.0.1";
             // 
             // nudPort
             // 
@@ -145,6 +147,7 @@
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.Size = new System.Drawing.Size(119, 20);
             this.txtPassword.TabIndex = 7;
+            this.txtPassword.Text = "1234";
             this.txtPassword.UseSystemPasswordChar = true;
             // 
             // label3
@@ -168,7 +171,6 @@
             // pLoginControls
             // 
             this.pLoginControls.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pLoginControls.Controls.Add(this.llServers);
             this.pLoginControls.Controls.Add(this.txtUsername);
             this.pLoginControls.Controls.Add(this.rbLogin);
             this.pLoginControls.Controls.Add(this.rbCreate);
@@ -186,20 +188,12 @@
             this.pLoginControls.Size = new System.Drawing.Size(348, 184);
             this.pLoginControls.TabIndex = 10;
             // 
-            // llServers
-            // 
-            this.llServers.AutoSize = true;
-            this.llServers.Location = new System.Drawing.Point(224, 116);
-            this.llServers.Name = "llServers";
-            this.llServers.Size = new System.Drawing.Size(116, 13);
-            this.llServers.TabIndex = 15;
-            this.llServers.TabStop = true;
-            this.llServers.Text = "Looking for all servers?";
-            this.llServers.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llServers_LinkClicked);
-            // 
             // txtUsername
             // 
             this.txtUsername.FormattingEnabled = true;
+            this.txtUsername.Items.AddRange(new object[] {
+            "example",
+            "vlod"});
             this.txtUsername.Location = new System.Drawing.Point(83, 62);
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(119, 21);
@@ -265,7 +259,6 @@
             // pbAd
             // 
             this.pbAd.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.pbAd.Image = global::PintoNS.Assets.LOGIN_PLACEHOLDER;
             this.pbAd.Location = new System.Drawing.Point(21, 244);
             this.pbAd.Name = "pbAd";
             this.pbAd.Size = new System.Drawing.Size(348, 136);
@@ -286,6 +279,8 @@
             // 
             // tpMain
             // 
+            this.tpMain.Controls.Add(this.label11);
+            this.tpMain.Controls.Add(this.label10);
             this.tpMain.Controls.Add(this.pbAd);
             this.tpMain.Controls.Add(this.lStatus);
             this.tpMain.Controls.Add(this.btnCancel);
@@ -298,6 +293,24 @@
             this.tpMain.TabIndex = 0;
             this.tpMain.Text = "Main";
             this.tpMain.UseVisualStyleBackColor = true;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(31, 266);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(126, 13);
+            this.label11.TabIndex = 14;
+            this.label11.Text = "This is just a placeholder!";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(31, 253);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(120, 13);
+            this.label10.TabIndex = 13;
+            this.label10.Text = "Nothing to see here yet!";
             // 
             // tpRegister
             // 
@@ -373,7 +386,7 @@
             this.txtRegisterIP.Name = "txtRegisterIP";
             this.txtRegisterIP.Size = new System.Drawing.Size(106, 20);
             this.txtRegisterIP.TabIndex = 2;
-            this.txtRegisterIP.Text = "ponso00.com";
+            this.txtRegisterIP.Text = "127.0.0.1";
             // 
             // label8
             // 
@@ -412,6 +425,7 @@
             this.txtRegisterPassword.Name = "txtRegisterPassword";
             this.txtRegisterPassword.Size = new System.Drawing.Size(119, 20);
             this.txtRegisterPassword.TabIndex = 7;
+            this.txtRegisterPassword.Text = "1234";
             this.txtRegisterPassword.UseSystemPasswordChar = true;
             // 
             // label9
@@ -429,6 +443,7 @@
             this.txtRegisterUsername.Name = "txtRegisterUsername";
             this.txtRegisterUsername.Size = new System.Drawing.Size(119, 20);
             this.txtRegisterUsername.TabIndex = 6;
+            this.txtRegisterUsername.Text = "example";
             // 
             // btnRegister
             // 
@@ -447,6 +462,7 @@
             this.ClientSize = new System.Drawing.Size(398, 446);
             this.Controls.Add(this.tcSections);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "UsingPintoForm";
@@ -503,7 +519,8 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox txtRegisterUsername;
         private System.Windows.Forms.Button btnRegister;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label10;
         private System.Windows.Forms.ComboBox txtUsername;
-        private System.Windows.Forms.LinkLabel llServers;
     }
 }
