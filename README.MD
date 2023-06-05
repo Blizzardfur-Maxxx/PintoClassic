@@ -14,7 +14,7 @@ A modernish IM client inspired by Skype 0.97
 Pinto! IM is not finished and will take a lot of time to be fully perfected and done
 
 # 📌 Information
-- Written in C# (.NET Framework 4.7.2)
+- Written in C# (.NET Framework 4.0)
 - The classic look and feel of Skype 0.97
 - Fully open and transparent design
 
